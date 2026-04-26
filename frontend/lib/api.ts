@@ -1,8 +1,7 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? ''
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://healthsethu.onrender.com'
 
 export function apiUrl(path: string): string {
   if (path.startsWith('http://') || path.startsWith('https://')) return path
-  if (!API_BASE_URL) return path
   return `${API_BASE_URL}${path}`
 }
 
