@@ -28,6 +28,7 @@ JWT_SECRET = os.getenv("JWT_SECRET", "healthsetu-jwt-super-secret-key-2024")
 COOKIE_NAME = "hs_token"
 COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")
+IS_PRODUCTION = os.getenv("ENVIRONMENT", "development") == "production"
 
 
 app = FastAPI(title="HealthSetu Backend")
@@ -340,7 +341,7 @@ async def auth_login(request: Request) -> JSONResponse:
         raise HTTPException(status_code=401, detail="Invalid email or password")
     token = make_token(user)
     res = JSONResponse({"user": {"id": user["id"], "name": user["name"], "email": user["email"], "role": user["role"]}})
-    res.set_cookie(COOKIE_NAME, token, httponly=True, samesite="lax", secure=False, max_age=COOKIE_MAX_AGE, path="/")
+    res.set_cookie(COOKIE_NAME, token, httponly=True, samesite="none" if IS_PRODUCTION else "lax", secure=IS_PRODUCTION, max_age=COOKIE_MAX_AGE, path="/")
     return res
 
 
@@ -367,7 +368,7 @@ async def auth_register(request: Request) -> JSONResponse:
     user_id = cur.lastrowid
     token = make_token({"id": user_id, "name": name.strip(), "email": email, "role": role})
     res = JSONResponse({"user": {"id": user_id, "name": name, "email": email, "role": role}}, status_code=201)
-    res.set_cookie(COOKIE_NAME, token, httponly=True, samesite="lax", secure=False, max_age=COOKIE_MAX_AGE, path="/")
+    res.set_cookie(COOKIE_NAME, token, httponly=True, samesite="none" if IS_PRODUCTION else "lax", secure=IS_PRODUCTION, max_age=COOKIE_MAX_AGE, path="/")
     return res
 
 
