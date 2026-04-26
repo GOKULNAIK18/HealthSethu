@@ -1,0 +1,15 @@
+{
+  "class_names": [
+    "Actinic keratosis",
+    "Atopic Dermatitis",
+    "Benign keratosis",
+    "Dermatofibroma",
+    "Melanocytic nevus",
+    "Melanoma",
+    "Squamous cell carcinoma",
+    "Tinea Ringworm Candidiasis",
+    "Vascular lesion"
+  ],
+  "val_accuracy": 87.85,
+  "model_arch": "efficientnet_b0"
+}
