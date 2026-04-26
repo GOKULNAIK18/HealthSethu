@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { apiFetch, setToken, clearToken } from '@/lib/api'
+import { apiFetch, setToken, clearToken, apiUrl } from '@/lib/api'
 
 export interface AuthUser {
   id: number
@@ -30,7 +30,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refresh = useCallback(async () => {
     try {
-      const res = await apiFetch('/api/auth/me')
+      const token = typeof window !== 'undefined' ? localStorage.getItem('hs_token') : null
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (token) headers['Authorization'] = `Bearer ${token}`
+      const res = await fetch(apiUrl('/api/auth/me'), { headers })
       if (res.ok) {
         const data = await res.json()
         if (data.token) setToken(data.token)

@@ -30,7 +30,7 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       })
       const data = await res.json()
-      if (!res.ok) { setError(data.error ?? 'Login failed'); return }
+      if (!res.ok) { setError(data.detail ?? data.error ?? 'Login failed'); return }
       if (data.token) setToken(data.token)
       await refresh()
       router.push('/')
