@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { apiFetch } from '@/lib/api'
+import { apiFetch, setToken, clearToken } from '@/lib/api'
 
 export interface AuthUser {
   id: number
@@ -33,6 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await apiFetch('/api/auth/me')
       if (res.ok) {
         const data = await res.json()
+        if (data.token) setToken(data.token)
         setUser(data.user)
       } else {
         setUser(null)
@@ -48,6 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     await apiFetch('/api/auth/logout', { method: 'POST' })
+    clearToken()
     setUser(null)
     router.push('/login')
   }

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { HeartPulse, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react'
 import { useAuth } from '@/contexts/auth-context'
-import { apiFetch } from '@/lib/api'
+import { apiFetch, setToken } from '@/lib/api'
 import { useI18n } from '@/contexts/i18n-context'
 import { languageNames } from '@/lib/i18n/dictionaries'
 
@@ -31,6 +31,7 @@ export default function LoginPage() {
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? 'Login failed'); return }
+      if (data.token) setToken(data.token)
       await refresh()
       router.push('/')
       router.refresh()

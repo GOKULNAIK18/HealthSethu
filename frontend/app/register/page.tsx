@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { HeartPulse, Eye, EyeOff, AlertCircle, Loader2, CheckCircle2 } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuth } from '@/contexts/auth-context'
-import { apiFetch } from '@/lib/api'
+import { apiFetch, setToken } from '@/lib/api'
 import { useI18n } from '@/contexts/i18n-context'
 import { languageNames } from '@/lib/i18n/dictionaries'
 
@@ -37,6 +37,7 @@ export default function RegisterPage() {
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? 'Registration failed'); return }
+      if (data.token) setToken(data.token)
       await refresh()
       router.push('/')
       router.refresh()

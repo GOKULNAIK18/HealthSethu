@@ -177,6 +177,10 @@ def make_token(user: dict[str, Any]) -> str:
 def current_user(request: Request) -> Optional[dict[str, Any]]:
     token = request.cookies.get(COOKIE_NAME)
     if not token:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+    if not token:
         return None
     try:
         return jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
@@ -347,7 +351,7 @@ async def auth_login(request: Request) -> JSONResponse:
     if not user or not bcrypt.checkpw(password.encode(), user["password_hash"].encode()):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     token = make_token(user)
-    res = JSONResponse({"user": {"id": user["id"], "name": user["name"], "email": user["email"], "role": user["role"]}})
+    res = JSONResponse({"user": {"id": user["id"], "name": user["name"], "email": user["email"], "role": user["role"]}, "token": token})
     res.set_cookie(COOKIE_NAME, token, httponly=True, samesite="none" if IS_PRODUCTION else "lax", secure=IS_PRODUCTION, max_age=COOKIE_MAX_AGE, path="/")
     return res
 
@@ -374,7 +378,7 @@ async def auth_register(request: Request) -> JSONResponse:
     conn.commit()
     user_id = cur.lastrowid
     token = make_token({"id": user_id, "name": name.strip(), "email": email, "role": role})
-    res = JSONResponse({"user": {"id": user_id, "name": name, "email": email, "role": role}}, status_code=201)
+    res = JSONResponse({"user": {"id": user_id, "name": name, "email": email, "role": role}, "token": token}, status_code=201)
     res.set_cookie(COOKIE_NAME, token, httponly=True, samesite="none" if IS_PRODUCTION else "lax", secure=IS_PRODUCTION, max_age=COOKIE_MAX_AGE, path="/")
     return res
 
@@ -387,7 +391,8 @@ def auth_me(request: Request) -> JSONResponse:
     row = to_dict(conn.execute("SELECT id,name,email,role,phone,village,district,created_at FROM users WHERE id = ?", (user["userId"],)).fetchone())
     if not row:
         return JSONResponse({"user": None}, status_code=401)
-    return JSONResponse({"user": row})
+    token = make_token({"id": row["id"], "name": row["name"], "email": row["email"], "role": row["role"]})
+    return JSONResponse({"user": row, "token": token})
 
 
 @app.post("/api/auth/logout")
