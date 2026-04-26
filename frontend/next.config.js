@@ -2,9 +2,7 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://healthsethu.onrender.com'
 
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['better-sqlite3', 'sharp'],
-  },
+  serverExternalPackages: ['better-sqlite3', 'sharp'],
   async rewrites() {
     return [
       {
