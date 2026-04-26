@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/auth-context'
 import { apiFetch, setToken } from '@/lib/api'
 import { useI18n } from '@/contexts/i18n-context'
 import { languageNames } from '@/lib/i18n/dictionaries'
+import { karnatakaDistricts } from '@/lib/mock-data'
 
 type Role = 'patient' | 'asha' | 'doctor'
 
@@ -17,6 +18,8 @@ export default function RegisterPage() {
   const router = useRouter()
   const { refresh } = useAuth()
   const [form, setForm] = useState({ name: '', email: '', password: '', phone: '', village: '', district: '', state: 'Karnataka' })
+  const [districtQuery, setDistrictQuery] = useState('')
+  const [districtOpen, setDistrictOpen] = useState(false)
   const [role,    setRole]    = useState<Role>('patient')
   const [show,    setShow]    = useState(false)
   const [loading, setLoading] = useState(false)
@@ -146,7 +149,30 @@ export default function RegisterPage() {
               </div>
               <Input label="Phone"   value={form.phone}    onChange={up('phone')}    placeholder="9876543210" type="tel" />
               <Input label="Village" value={form.village}  onChange={up('village')}  placeholder="e.g. Rampur" />
-              <Input label="District" value={form.district} onChange={up('district')} placeholder="e.g. Sitapur" col={2} />
+              <div className="col-span-2 space-y-1.5">
+                <label className="text-xs font-medium text-slate-400">District</label>
+                <div className="relative">
+                  <input
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all"
+                    placeholder="Search district…"
+                    value={districtQuery || form.district}
+                    onChange={e => { setDistrictQuery(e.target.value); setDistrictOpen(true); setForm(f => ({ ...f, district: e.target.value })) }}
+                    onFocus={() => setDistrictOpen(true)}
+                    onBlur={() => setTimeout(() => setDistrictOpen(false), 150)}
+                    autoComplete="off"
+                  />
+                  {districtOpen && (
+                    <ul className="absolute z-50 mt-1 w-full bg-slate-900 border border-white/10 rounded-xl shadow-xl max-h-48 overflow-y-auto">
+                      {karnatakaDistricts.filter(d => d.toLowerCase().includes(districtQuery.toLowerCase())).map(d => (
+                        <li key={d} onMouseDown={() => { setForm(f => ({ ...f, district: d })); setDistrictQuery(d); setDistrictOpen(false) }}
+                          className={`px-4 py-2 text-sm cursor-pointer transition-colors ${ form.district === d ? 'bg-sky-500/20 text-sky-300' : 'text-slate-300 hover:bg-white/8' }`}>
+                          {d}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
               <Input label="State" value={form.state} onChange={up('state')} placeholder="e.g. Karnataka" col={2} />
             </div>
 
