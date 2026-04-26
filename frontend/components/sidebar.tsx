@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, UserPlus, Brain, Users, Stethoscope,
-  TrendingUp, HeartPulse, Shield, LogOut, Share2,
+  TrendingUp, HeartPulse, Shield, LogOut, Share2, Menu, X,
 } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuth } from '@/contexts/auth-context'
@@ -12,6 +12,7 @@ import { canAccessPath } from '@/lib/role-access'
 import type { AppRole } from '@/lib/role-access'
 import { languageNames } from '@/lib/i18n/dictionaries'
 import { useI18n } from '@/contexts/i18n-context'
+import { useState } from 'react'
 
 const navItems = [
   { href: '/',                  labelKey: 'nav.dashboard',        icon: LayoutDashboard, exact: true  },
@@ -34,13 +35,12 @@ export default function Sidebar() {
   const pathname = usePathname()
   const { user, logout } = useAuth()
   const { language, setLanguage, t } = useI18n()
+  const [open, setOpen] = useState(false)
 
-  // Hide sidebar on auth pages
   if (pathname === '/login' || pathname === '/register') return null
 
-  return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-slate-900/90 backdrop-blur-xl border-r border-white/8 z-40 flex flex-col">
-
+  const sidebarContent = (
+    <aside className="h-full flex flex-col">
       {/* Brand */}
       <div className="px-5 py-5 border-b border-white/8">
         <div className="flex items-center gap-3">
@@ -67,6 +67,7 @@ export default function Sidebar() {
             <Link
               key={href}
               href={href}
+              onClick={() => setOpen(false)}
               aria-current={active ? 'page' : undefined}
               className={clsx(
                 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
@@ -123,5 +124,40 @@ export default function Sidebar() {
         </div>
       </div>
     </aside>
+  )
+
+  return (
+    <>
+      {/* Mobile top bar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-slate-900/95 backdrop-blur-xl border-b border-white/8">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 bg-gradient-to-br from-sky-500 to-emerald-500 rounded-lg flex items-center justify-center">
+            <HeartPulse className="w-4 h-4 text-white" />
+          </div>
+          <span className="text-sm font-bold text-white">HealthSetu</span>
+        </div>
+        <button onClick={() => setOpen(v => !v)} className="text-slate-400 hover:text-white p-1">
+          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </div>
+
+      {/* Mobile drawer overlay */}
+      {open && (
+        <div className="md:hidden fixed inset-0 z-40 bg-black/60" onClick={() => setOpen(false)} />
+      )}
+
+      {/* Mobile drawer */}
+      <div className={clsx(
+        'md:hidden fixed top-0 left-0 h-full w-64 z-50 bg-slate-900/95 backdrop-blur-xl border-r border-white/8 transition-transform duration-300',
+        open ? 'translate-x-0' : '-translate-x-full'
+      )}>
+        {sidebarContent}
+      </div>
+
+      {/* Desktop sidebar */}
+      <div className="hidden md:block fixed left-0 top-0 h-screen w-64 bg-slate-900/90 backdrop-blur-xl border-r border-white/8 z-40">
+        {sidebarContent}
+      </div>
+    </>
   )
 }
