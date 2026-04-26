@@ -30,11 +30,18 @@ COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")
 IS_PRODUCTION = os.getenv("ENVIRONMENT", "development") == "production"
 
+ALLOWED_ORIGINS = [FRONTEND_ORIGIN, "http://localhost:3000"]
+# Allow all Vercel preview deployments
+_extra = os.getenv("EXTRA_ORIGINS", "")
+if _extra:
+    ALLOWED_ORIGINS += [o.strip() for o in _extra.split(",") if o.strip()]
+
 
 app = FastAPI(title="HealthSetu Backend")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_ORIGIN],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"https://health-sethu-.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
