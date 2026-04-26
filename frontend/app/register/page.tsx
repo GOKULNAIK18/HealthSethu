@@ -16,7 +16,7 @@ export default function RegisterPage() {
   const { t, language, setLanguage } = useI18n()
   const router = useRouter()
   const { refresh } = useAuth()
-  const [form, setForm] = useState({ name: '', email: '', password: '', phone: '', village: '', district: '' })
+  const [form, setForm] = useState({ name: '', email: '', password: '', phone: '', village: '', district: '', state: 'Karnataka' })
   const [role,    setRole]    = useState<Role>('patient')
   const [show,    setShow]    = useState(false)
   const [loading, setLoading] = useState(false)
@@ -147,6 +147,7 @@ export default function RegisterPage() {
               <Input label="Phone"   value={form.phone}    onChange={up('phone')}    placeholder="9876543210" type="tel" />
               <Input label="Village" value={form.village}  onChange={up('village')}  placeholder="e.g. Rampur" />
               <Input label="District" value={form.district} onChange={up('district')} placeholder="e.g. Sitapur" col={2} />
+              <Input label="State" value={form.state} onChange={up('state')} placeholder="e.g. Karnataka" col={2} />
             </div>
 
             <button type="submit" disabled={loading}

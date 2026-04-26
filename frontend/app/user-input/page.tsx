@@ -19,7 +19,7 @@ interface Form {
   village: string; district: string; state: string; phone: string
 }
 
-const INIT: Form = { name:'', age:'', gender:'', village:'', district:'', state:'Madhya Pradesh', phone:'' }
+const INIT: Form = { name:'', age:'', gender:'', village:'', district:'', state:'Karnataka', phone:'' }
 
 interface CreatedCase {
   id: number
